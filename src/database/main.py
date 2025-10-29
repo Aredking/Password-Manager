@@ -2,6 +2,9 @@ from account_dao import AccountDAO
 from src.database.entity import Account
 
 dao = AccountDAO()
-dao.delete_by_id(2)
+# Поддерживаются следующие операции:
+# Получения всех записей из БД
+# Добавление записи
+# Удаление по id
 
 print(*dao.get_all_accounts())
