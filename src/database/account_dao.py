@@ -1,12 +1,12 @@
-import sqlite3
-from entity import Account
+import sqlite3, os
 
+from src.database.entities import Account
 
 class AccountDAO:
     _instance = None
 
     __TABLE_NAME = "ACCOUNTS"
-    __FILE_NAME = "../../database/database.db"
+    __FILE_NAME = os.path.join(os.path.dirname(__file__), "..", "..", "database", "database.db")
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -67,4 +67,26 @@ class AccountDAO:
             cursor.execute(f"""
             DELETE FROM {AccountDAO.__TABLE_NAME} WHERE id = ?
             """, (account_id,))
+            conn.commit()
+
+    def find_by_source(self, source: str) -> list[Account]:
+        with sqlite3.connect(AccountDAO.__FILE_NAME) as conn:
+            cursor = conn.cursor()
+            result = cursor.execute(f"""
+            SELECT * FROM {AccountDAO.__TABLE_NAME} WHERE source=?""", (source,)).fetchall()
+
+        accounts = list()
+        for row in result:
+            accounts.append(Account(row[1], row[2], row[3], id=row[0]))
+
+        return accounts
+
+    def update_password(self, account_id: int, new_password: str) -> None:
+        with sqlite3.connect(AccountDAO.__FILE_NAME) as conn:
+            cursor = conn.cursor()
+            cursor.execute(f"""
+            UPDATE {AccountDAO.__TABLE_NAME}
+            SET password = ?
+            WHERE id = ?
+            """, (new_password, account_id,))
             conn.commit()
