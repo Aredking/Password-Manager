@@ -3,7 +3,7 @@ from PyQt6 import uic
 
 from src.database.account_dao import AccountDAO
 from src.database.entities import Account
-from src.widgets import PasswordsTableModel
+from src.widgets import PasswordsTableModel, PasswordDelegate
 
 import os
 
@@ -26,9 +26,9 @@ class EntryForm(ParentForm):
     def initUI(self):
         base_dir = os.path.dirname(__file__)  # директория, где лежит текущий файл
         ui_path = os.path.join(base_dir, "..", "res", "ui", "entryForm.ui")
-        uic.loadUi(ui_path, self)
 
-        self.lineEdit: QLineEdit
+        self.lineEdit: QLineEdit = None
+        uic.loadUi(ui_path, self)
 
         self.lineEdit.returnPressed.connect(self.main_window.goto_passwords_manager_form)
 
@@ -38,16 +38,20 @@ class PasswordsManagerForm(ParentForm):
         super().__init__(main_window)
 
     def initUI(self):
-        base_dir = os.path.dirname(__file__)  # директория, где лежит текущий файл
-        ui_path = os.path.join(base_dir, "..", "res", "ui", "passwordsManagerForm.ui")
-        uic.loadUi(ui_path, self)
+        base_dir = os.path.dirname(__file__)
+        ui_path = os.path.join(base_dir, "..", "res", "ui",
+                               "passwordsManagerForm.ui")  # Здесь я получаю путь к ui файлу.
 
-        self.passwordsTable: QTableView
+        self.passwordsTable: QTableView = None
+        uic.loadUi(ui_path, self)  # Здесь происходит загрузка виджетов из ui файла
+
+        # Настройка таблицы
+        self.passwordsTable.setItemDelegateForColumn(2, PasswordDelegate())
         header = self.passwordsTable.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
+        # Загрузка данных из БД
         self.load_table()
-
 
     def load_table(self):
         dao = AccountDAO()

@@ -2,6 +2,7 @@ import sqlite3, os
 
 from src.database.entities import Account
 
+
 class AccountDAO:
     _instance = None
 
