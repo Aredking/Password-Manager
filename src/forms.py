@@ -1,9 +1,9 @@
-from PyQt6.QtWidgets import QWidget, QLineEdit, QTableView, QHeaderView
+from PyQt6.QtCore import QSize
+from PyQt6.QtWidgets import QWidget, QLineEdit, QTableWidget, QTableWidgetItem, QPushButton, QHeaderView
 from PyQt6 import uic
 
 from src.database.account_dao import AccountDAO
 from src.database.entities import Account
-from src.widgets import PasswordsTableModel, PasswordDelegate
 
 import os
 
@@ -42,17 +42,36 @@ class PasswordsManagerForm(ParentForm):
         ui_path = os.path.join(base_dir, "..", "res", "ui",
                                "passwordsManagerForm.ui")  # Здесь я получаю путь к ui файлу.
 
-        self.passwordsTable: QTableView = None
-        uic.loadUi(ui_path, self)  # Здесь происходит загрузка виджетов из ui файла
+        self.passwordsTable: QTableWidget = None
+        uic.loadUi(ui_path, self)
 
-        # Настройка таблицы
-        self.passwordsTable.setItemDelegateForColumn(2, PasswordDelegate())
-        header = self.passwordsTable.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.passwordsTable.setColumnCount(3)
+        self.passwordsTable.setHorizontalHeaderLabels(["Источник", "Логин", "Удалить аккаунт"])
+        self.passwordsTable.horizontalHeader().setSelectionMode(self.passwordsTable.SelectionMode.NoSelection)
+        self.passwordsTable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.passwordsTable.setStyleSheet("""
+        QTableWidget {
+            font-size: 12pt;
+        }
+        QHeaderView::section {
+            font-size: 12pt;
+            font-weight: bold;
+        }""")
 
-        # Загрузка данных из БД
-        self.load_table()
+        self.__load_table()
 
-    def load_table(self):
+    def __load_table(self):
         dao = AccountDAO()
-        self.passwordsTable.setModel(PasswordsTableModel(dao.get_all_accounts()))
+        data = dao.get_all_accounts()
+
+        self.passwordsTable.setRowCount(len(data))
+        for row, account in enumerate(data):
+            self.passwordsTable.setItem(row, 0, QTableWidgetItem(account.source))
+            self.passwordsTable.setItem(row, 1, QTableWidgetItem(account.login))
+            btn = QPushButton("🗑")
+            btn.clicked.connect(lambda r=row: self.__delete_row(r, account.id))
+            # btn.setFixedSize(QSize(40, 40))
+            self.passwordsTable.setCellWidget(row, 2, btn)
+
+    def __delete_row(self, row, account_id):
+        self.passwordsTable.removeRow(row)
