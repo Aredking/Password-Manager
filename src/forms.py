@@ -2,7 +2,7 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QWidget, QLineEdit, QTableWidget, QTableWidgetItem, QPushButton, QHeaderView
 from PyQt6 import uic
 
-from src.database.account_dao import AccountDAO
+from src.database.dao import AccountDAO
 from src.database.entities import Account
 
 import os

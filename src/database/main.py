@@ -1,10 +1,12 @@
-from account_dao import AccountDAO
-from src.database.entity import Account
+from src.database.dao import UserDAO, AccountDAO
+from src.database.entities import Account
 
-dao = AccountDAO()
-# Поддерживаются следующие операции:
-# Получения всех записей из БД
-# Добавление записи
-# Удаление по id
+user_dao = UserDAO()
+acc_dao = AccountDAO()
 
-print(*dao.get_all_accounts())
+user, = user_dao.get_all_users()
+# acc_dao.add_account(Account("Mail", "email", "pass"), user.id)
+
+accounts = acc_dao.get_all_accounts(user.id)
+
+print(*accounts, sep='\n')
