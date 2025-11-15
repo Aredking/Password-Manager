@@ -119,6 +119,11 @@ class UserDAO(DAO):
             cursor.execute(f"""
             INSERT INTO {DAO._USERS_TABLE} (username, password) VALUES(?, ?) 
             """, (user.username, get_hash_password(user.password)))
+            id = cursor.execute(f"""
+            SELECT id FROM {DAO._USERS_TABLE}
+            WHERE MAX(id)
+            """).fetchone()
+            user.id = id[0]
             conn.commit()
 
     def delete_by_id(self, user_id: int) -> None:
