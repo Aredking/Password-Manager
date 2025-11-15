@@ -16,11 +16,14 @@ class PasswordsCipher:
         self.__load_key()
 
     def __load_key(self) -> None:
-        self.aes_key = base64.b64decode(keyring.get_password(PasswordsCipher.__SERVICE_NAME, PasswordsCipher.__USERNAME))
-        if not self.aes_key:
+        aes_key_str = keyring.get_password(PasswordsCipher.__SERVICE_NAME, PasswordsCipher.__USERNAME)
+        if aes_key_str is None:
             self.aes_key = get_random_bytes(32)
             aes_key_str = base64.b64encode(self.aes_key).decode('utf-8')
             keyring.set_password(PasswordsCipher.__SERVICE_NAME, PasswordsCipher.__USERNAME, aes_key_str)
+        else:
+            self.aes_key = base64.b64decode(aes_key_str)
+
 
     def encode(self, data: str) -> bytes:
         cipher = AES.new(self.aes_key, AES.MODE_CBC)
