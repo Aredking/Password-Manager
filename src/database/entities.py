@@ -10,10 +10,10 @@ class Account:
 
 
 class User:
-    def __init__(self, username: str, password: bytes, id: int = None):
+    def __init__(self, username: str, password: str, id: int = None):
         self.id = id
         self.username = username
-        self.password = password
+        self.password = password.encode()
 
     def __str__(self):
         return f"(id={self.id}, user_name={self.username}, password={self.password})"

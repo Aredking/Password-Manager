@@ -35,10 +35,10 @@ class PasswordsCipher:
         plaintext = unpad(plaintext_padded, AES.block_size)
         return plaintext.decode('utf-8')
 
-def check_passwords_hash(password: bytes, hash: str) -> bool:
+def check_passwords_hash(password: bytes, hash: bytes) -> bool: # Сравнение паролей
     return bcrypt.checkpw(password, hash)
 
-def get_hash_password(password: bytes) -> bytes:
+def get_hash_password(password: bytes) -> bytes: # Получение хэша пароля
     return bcrypt.hashpw(password, bcrypt.gensalt())
 
 
