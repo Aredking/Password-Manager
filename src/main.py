@@ -4,7 +4,7 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QMainWindow, QApplication
 
 from src.database.entities import User
-from src.forms import EntryForm, PasswordsManagerForm
+from src.ui.forms import EntryForm, PasswordsManagerForm
 
 
 class MainWindow(QMainWindow):
@@ -21,8 +21,9 @@ class MainWindow(QMainWindow):
         self.centralWidget().deleteLater()
         self.setCentralWidget(PasswordsManagerForm(self, user))  # Не забываем обновить центральный виджет!
 
-    def goto_passwords_generator_form(self):
-        pass
+    def goto_entry_form(self):
+        self.centralWidget().deleteLater()
+        self.setCentralWidget(EntryForm(self))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -74,14 +74,17 @@ class AccountDAO(DAO):
             """, (account_id,))
             conn.commit()
 
-    def update_password(self, account_id: int, new_password: str) -> None:
+    def update_account(self, account_id: int, account: Account) -> None:
+        cipher = PasswordsCipher()
         with sqlite3.connect(DAO._FILE_NAME) as conn:
             cursor = conn.cursor()
             cursor.execute(f"""
             UPDATE {DAO._ACCOUNTS_TABLE}
-            SET password = ?
+            SET source = ?,
+                login = ?,
+                password = ?
             WHERE id = ?
-            """, (new_password, account_id,))
+            """, (account.source, account.login, cipher.encode(account.password), account_id,))
             conn.commit()
 
 
@@ -120,11 +123,16 @@ class UserDAO(DAO):
             INSERT INTO {DAO._USERS_TABLE} (username, password) VALUES(?, ?) 
             """, (user.username, get_hash_password(user.password)))
             id = cursor.execute(f"""
-            SELECT id FROM {DAO._USERS_TABLE}
-            WHERE MAX(id)
+            SELECT * FROM {DAO._USERS_TABLE} ORDER BY id DESC LIMIT 1;
             """).fetchone()
             user.id = id[0]
             conn.commit()
+
+    def user_exists(self, username: str) -> bool:
+        with sqlite3.connect(DAO._FILE_NAME) as conn:
+            return bool(conn.cursor().execute(f"""
+            SELECT * FROM {DAO._USERS_TABLE} WHERE username = ?
+            """, (username, )).fetchall())
 
     def delete_by_id(self, user_id: int) -> None:
         with sqlite3.connect(DAO._FILE_NAME) as conn:

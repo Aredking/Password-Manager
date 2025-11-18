@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>325</width>
     <height>180</height>
    </rect>
   </property>
@@ -91,6 +91,9 @@
        <family>Segoe UI</family>
        <pointsize>10</pointsize>
       </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: red</string>
      </property>
      <property name="text">
       <string/>
